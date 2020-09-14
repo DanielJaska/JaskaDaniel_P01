@@ -8,11 +8,19 @@ public class PlayerShip : MonoBehaviour
     [SerializeField] float _moveSpeed = 12f;
     [SerializeField] float _turnSpeed = 3f;
 
+    [Header("Feedback")]
+    [SerializeField] TrailRenderer _trail = null;
+
     Rigidbody _rb = null;
+    [SerializeField] Vector3 spawnPosition;
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
+
+        _trail.enabled = false;
+
+        spawnPosition = transform.position;
     }
 
     private void FixedUpdate()
@@ -26,7 +34,7 @@ public class PlayerShip : MonoBehaviour
         float moveAmountThisFrame = Input.GetAxisRaw("Vertical") * _moveSpeed;
 
         Vector3 moveDirection = transform.forward * moveAmountThisFrame;
-
+        
         _rb.AddForce(moveDirection);
     }
 
@@ -42,6 +50,17 @@ public class PlayerShip : MonoBehaviour
     public void Kill()
     {
         Debug.Log("Player has been killed!");
-        this.gameObject.SetActive(false);
+        transform.position = spawnPosition;
+        _rb.velocity = Vector3.zero;
+    }
+
+    public void SetSpeed(float speedChange)
+    {
+        _moveSpeed += speedChange;
+    }
+
+    public void SetBoosters(bool activeState)
+    {
+        _trail.enabled = activeState;
     }
 }

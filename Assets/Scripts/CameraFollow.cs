@@ -19,4 +19,25 @@ public class CameraFollow : MonoBehaviour
     {
         this.transform.position = _objectToFollow.position + _objectOffset;
     }
+
+    //public void AdjustCameraHeight(float y)
+    //{
+    //    StartCoroutine(MoveCamera(y));
+    //}
+
+    //IEnumerator MoveCamera(float y)
+    //{
+    //    for(int i = 0; i < y; i++)
+    //    {
+    //        if(y > 0)
+    //        {
+    //            _objectOffset.y += .1f;
+    //        } else
+    //        {
+    //            _objectOffset.y += -.1f;
+    //        }
+            
+    //        yield return new WaitForSeconds(.01f);
+    //    }
+    //}
 }
