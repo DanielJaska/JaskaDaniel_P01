@@ -76,6 +76,8 @@ public class PowerupSpeed : MonoBehaviour
 
         //cameraPosition?.AdjustCameraHeight(-_cameraZoomOutDistance);
 
+        particles.Play();
+
         playerShip?.SetBoosters(false);
     }
 

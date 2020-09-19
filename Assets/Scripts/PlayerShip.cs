@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerShip : MonoBehaviour
@@ -8,11 +10,31 @@ public class PlayerShip : MonoBehaviour
     [SerializeField] float _moveSpeed = 12f;
     [SerializeField] float _turnSpeed = 3f;
 
+    [SerializeField] GameObject visuals;
+
     [Header("Feedback")]
     [SerializeField] TrailRenderer _trail = null;
 
     Rigidbody _rb = null;
     [SerializeField] Vector3 spawnPosition;
+
+    [SerializeField] Transform enemyParent;
+
+    [SerializeField] ParticleSystem particles;
+
+    [SerializeField] GameObject projectile;
+
+    [SerializeField] AudioClip deadClip;
+    [SerializeField] AudioClip loseClip;
+    [SerializeField] AudioClip winClip;
+
+    [Header("UI Components")]
+    [SerializeField] GameObject gameOverScreen;
+    [SerializeField] Text timerValue;
+    [SerializeField] Text resetLevelText;
+    [SerializeField] GameObject winScreen;
+
+    public static bool isRespawning = false;
 
     private void Awake()
     {
@@ -21,12 +43,26 @@ public class PlayerShip : MonoBehaviour
         _trail.enabled = false;
 
         spawnPosition = transform.position;
+
+        gameOverScreen.SetActive(false);
+        winScreen.SetActive(false);
     }
 
     private void FixedUpdate()
     {
-        MoveShip();
-        TurnShip();
+        if(isRespawning == false)
+        {
+            MoveShip();
+            TurnShip();
+        }
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Space) && isRespawning == false)
+        {
+            Instantiate(projectile, transform.position, transform.rotation);
+        }
     }
 
     void MoveShip()
@@ -34,7 +70,6 @@ public class PlayerShip : MonoBehaviour
         float moveAmountThisFrame = Input.GetAxisRaw("Vertical") * _moveSpeed;
 
         Vector3 moveDirection = transform.forward * moveAmountThisFrame;
-        
         _rb.AddForce(moveDirection);
     }
 
@@ -47,11 +82,62 @@ public class PlayerShip : MonoBehaviour
         _rb.MoveRotation(_rb.rotation * turnOffset);
     }
 
+    public void Win()
+    {
+        AudioController.PlayClip(winClip);
+
+        winScreen.SetActive(true);
+        isRespawning = true;
+        DisablePlayer();
+    }
+    
     public void Kill()
     {
-        Debug.Log("Player has been killed!");
-        transform.position = spawnPosition;
+        gameOverScreen.SetActive(true);
+
+        AudioController.PlayClip(deadClip);
+
+        DisablePlayer();
+
+        if(isRespawning == false)
+        {
+            StartCoroutine(Killed());
+        }
+        
+    }
+
+    private void DisablePlayer()
+    {
+        visuals.SetActive(false);
+        GetComponent<BoxCollider>().enabled = false;
         _rb.velocity = Vector3.zero;
+
+        particles.Play();
+
+        for (int i = 0; i < enemyParent.childCount; i++)
+        {
+            enemyParent.GetChild(i).GetComponent<EnemyController>().enabled = false;
+        }
+    }
+
+    IEnumerator Killed()
+    {
+        isRespawning = true;
+
+        AudioController.PlayClip(loseClip);
+
+        timerValue.text = "2";
+        yield return new WaitForSeconds(1);
+        timerValue.text = "1";
+        yield return new WaitForSeconds(1);
+        timerValue.text = "0";
+
+        //resetLevelText.gameObject.SetActive(true);
+
+        int activeSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(activeSceneIndex);
+
+        isRespawning = false;
     }
 
     public void SetSpeed(float speedChange)
