@@ -24,6 +24,10 @@ public class EnemyController : MonoBehaviour
     void Update()
     {
         GetComponent<NavMeshAgent>().SetDestination(target.position);
+        if(PlayerShip.playerState != PlayerShip.PlayerState.PLAYING)
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void SetTarget(Transform player)

@@ -16,7 +16,7 @@ public class SpawnEnemy : MonoBehaviour
     
     private void Update()
     {
-        if(hasSpawned == false)
+        if(hasSpawned == false && PlayerShip.playerState == PlayerShip.PlayerState.PLAYING)
         {
             StartCoroutine(SpawnDelay());
         }

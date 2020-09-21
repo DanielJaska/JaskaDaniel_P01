@@ -36,7 +36,7 @@ public class GameController : MonoBehaviour
 
     private void Update()
     {
-        if(PlayerShip.isRespawning == false)
+        if(PlayerShip.playerState == PlayerShip.PlayerState.PLAYING)
         {
             if (currentTimer <= 0)
             {

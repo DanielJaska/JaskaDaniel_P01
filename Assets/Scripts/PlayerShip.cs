@@ -34,10 +34,21 @@ public class PlayerShip : MonoBehaviour
     [SerializeField] Text resetLevelText;
     [SerializeField] GameObject winScreen;
 
-    public static bool isRespawning = false;
+    public enum PlayerState
+    {
+        WIN,
+        LOSE,
+        PLAYING
+    }
+
+    public static PlayerState playerState;
+
+    //public static bool isRespawning = false;
 
     private void Awake()
     {
+        playerState = PlayerState.PLAYING;
+
         _rb = GetComponent<Rigidbody>();
 
         _trail.enabled = false;
@@ -50,7 +61,7 @@ public class PlayerShip : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(isRespawning == false)
+        if(playerState == PlayerState.PLAYING)
         {
             MoveShip();
             TurnShip();
@@ -59,7 +70,7 @@ public class PlayerShip : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space) && isRespawning == false)
+        if(Input.GetKeyDown(KeyCode.Space) && playerState == PlayerState.PLAYING)
         {
             Instantiate(projectile, transform.position, transform.rotation);
         }
@@ -87,7 +98,8 @@ public class PlayerShip : MonoBehaviour
         AudioController.PlayClip(winClip);
 
         winScreen.SetActive(true);
-        isRespawning = true;
+        //isRespawning = true;
+        playerState = PlayerState.WIN;
         DisablePlayer();
     }
     
@@ -99,7 +111,7 @@ public class PlayerShip : MonoBehaviour
 
         DisablePlayer();
 
-        if(isRespawning == false)
+        if(playerState == PlayerState.PLAYING)
         {
             StartCoroutine(Killed());
         }
@@ -114,15 +126,16 @@ public class PlayerShip : MonoBehaviour
 
         particles.Play();
 
-        for (int i = 0; i < enemyParent.childCount; i++)
-        {
-            enemyParent.GetChild(i).GetComponent<EnemyController>().enabled = false;
-        }
+        //for (int i = 0; i < enemyParent.childCount; i++)
+        //{
+        //    enemyParent.GetChild(i).GetComponent<EnemyController>().enabled = false;
+        //}
     }
 
     IEnumerator Killed()
     {
-        isRespawning = true;
+        //isRespawning = true;
+        playerState = PlayerState.LOSE;
 
         AudioController.PlayClip(loseClip);
 
@@ -137,7 +150,8 @@ public class PlayerShip : MonoBehaviour
         int activeSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(activeSceneIndex);
 
-        isRespawning = false;
+        //isRespawning = false;
+        playerState = PlayerState.PLAYING;
     }
 
     public void SetSpeed(float speedChange)

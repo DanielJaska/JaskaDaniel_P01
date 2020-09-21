@@ -8,7 +8,7 @@ public class GameInput : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Backspace) && PlayerShip.isRespawning == false)
+        if(Input.GetKeyDown(KeyCode.Backspace) && PlayerShip.playerState != PlayerShip.PlayerState.LOSE)
         {
             ReloadLevel();
         }
